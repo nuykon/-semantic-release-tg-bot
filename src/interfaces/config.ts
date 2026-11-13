@@ -1,50 +1,49 @@
-export type TGBotChatId = string | number;
-export type TGBotMessageFormat = 'html' | 'markdown';
+/** Stable configuration vocabulary retained for existing consuming projects. */
+export type TGBotChatId = number | string;
+export type TGBotMessageFormat = 'markdown' | 'html';
 
-export interface Context {
- logger: {log(message: string): void};
- env: Record<string, string | undefined>;
- branch?: {name: string};
- lastRelease?: unknown;
- nextRelease?: {version: string; notes?: string};
- commits?: readonly unknown[];
- errors?: Error[];
-}
+type ReleaseVersion = {version: string; notes?: string};
+type ReleaseBranch = {name: string};
+type Variables = Record<string, string | undefined>;
 
-export interface TemplateContext {
- packageName?: string;
- branch?: Context['branch'];
- lastRelease?: unknown;
- nextRelease?: Context['nextRelease'];
- commits?: readonly unknown[];
- errors?: Error[];
- [key: string]: unknown;
-}
+export type Context = {
+    env: Variables;
+    logger: {log: (entry: string) => void};
+    nextRelease?: ReleaseVersion;
+    lastRelease?: unknown;
+    branch?: ReleaseBranch;
+    errors?: Error[];
+    commits?: readonly unknown[];
+};
 
-export interface TGBotMessage<T = unknown> {
- message: string | ((context: TemplateContext) => string);
- format?: TGBotMessageFormat;
- customData?: Record<string, T>;
-}
+export type TemplateContext = {
+    [variable: string]: unknown;
+    packageName?: string;
+    nextRelease?: ReleaseVersion;
+    lastRelease?: unknown;
+    branch?: ReleaseBranch;
+    errors?: Error[];
+    commits?: readonly unknown[];
+};
 
-export interface TGBotMessageTemplate<T = unknown> {
- path: string;
- customData?: Record<string, T>;
-}
-
-export interface TGBotNotify {
- notifyOnSuccess?: boolean;
- notifyOnFail?: boolean;
- success?: TGBotMessage | TGBotMessageTemplate;
- fail?: TGBotMessage | TGBotMessageTemplate;
-}
-
-export interface TGBotNotificationConfig extends TGBotNotify {
- chatIds: TGBotChatId | TGBotChatId[];
- branch?: string;
-}
-
-export interface TGBotConfig extends TGBotNotify {
- notifications: TGBotNotificationConfig[];
- packageName?: string;
-}
+type TemplateData<T> = {customData?: Record<string, T>};
+export type TGBotMessage<T = unknown> = TemplateData<T> & {
+    message: string | ((data: TemplateContext) => string);
+    format?: TGBotMessageFormat;
+};
+export type TGBotMessageTemplate<T = unknown> = TemplateData<T> & {path: string};
+type Content = TGBotMessage | TGBotMessageTemplate;
+export type TGBotNotify = Partial<{
+    success: Content;
+    fail: Content;
+    notifyOnSuccess: boolean;
+    notifyOnFail: boolean;
+}>;
+export type TGBotNotificationConfig = TGBotNotify & {
+    branch?: string;
+    chatIds: TGBotChatId | TGBotChatId[];
+};
+export type TGBotConfig = TGBotNotify & {
+    packageName?: string;
+    notifications: TGBotNotificationConfig[];
+};

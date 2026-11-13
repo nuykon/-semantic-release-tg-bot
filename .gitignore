@@ -1,48 +1,15 @@
+# Local credentials and package-manager state
 .npmrc
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+node_modules/
 
-# compiled output
-/lib
-/tmp
-
-# dependencies
-/node_modules
-
-# profiling files
-chrome-profiler-events.json
-speed-measure-plugin.json
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-.nyc_output
-
-# System Files
-.DS_Store
-Thumbs.db
-
-# compiled tests and config
-/.test-build
+# Generated artifacts
+lib/
+.test-build/
+coverage/
 *.tgz
+pnpm-debug.log*
+
+# Local editor and platform metadata
+.idea/
+.vscode/
+.DS_Store

@@ -1,14 +1,14 @@
 import type {Context, TGBotMessageFormat} from '../interfaces/config';
 import * as https from 'node:https';
 import * as proxyAgent from './proxy-agent';
-import * as constants from './constants';
+import {environment} from './configuration';
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_RESPONSE_BYTES = 1_048_576;
 const sendMessage = async (message: {message: string; format: TGBotMessageFormat}, chatId: string | number, { logger, env }: Context): Promise<void> => {
-    const token = env[constants.TG_BOT_TOKEN_ENV];
+    const token = env[environment.token];
     if (!token)
-        throw new Error('No Telegram token defined.');
-    const proxy = env[constants.TG_BOT_PROXY_ENV];
+        throw new Error('Telegram delivery requires a bot token.');
+    const proxy = env[environment.proxy];
     const signal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
     const agent = proxy ? new proxyAgent.ProxyAgent(proxy, signal) : undefined;
     const body = JSON.stringify({
@@ -16,7 +16,7 @@ const sendMessage = async (message: {message: string; format: TGBotMessageFormat
         text: message.message,
         parse_mode: message.format === 'html' ? 'HTML' : 'MarkdownV2',
     });
-    logger.log(`Sending message to telegram chat (id=${chatId})...`);
+    logger.log(`Delivering a release notification to ${chatId}.`);
     try {
         await new Promise<void>((resolve, reject) => {
             const req = https.request({

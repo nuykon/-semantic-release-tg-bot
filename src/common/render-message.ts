@@ -17,7 +17,7 @@ const lookup = (context: TemplateContext, expression: string): string => {
  return value == null ? '' : String(value);
 };
 const interpolate = (source: string, context: TemplateContext): string => {
- if (/{%|{#|<%/.test(source)) throw new Error('Template control tags are unsupported. Use a message function in a JavaScript configuration.');
+ if (/{%|{#|<%/.test(source)) throw new Error('Template control tags are unsupported. Use a message function in a TypeScript configuration.');
  return source.replace(/\$\{([^{}]+)\}|{{\s*([^{}]+?)\s*}}/g, (_, dollar, braces) => lookup(context, dollar ?? braces));
 };
 const renderMessage = (message: TGBotMessage | TGBotMessageTemplate, context: TemplateContext = {}): {message: string; format: TGBotMessageFormat} => {

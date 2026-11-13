@@ -1,16 +1,23 @@
-import type {TGBotConfig, Context} from './interfaces/config';
-import * as constants from './common/constants';
-import * as errors from './common/semantic-release-error';
-function verifyConditions(config: TGBotConfig, { logger, env }: Context): void {
-    const botToken = env[constants.TG_BOT_TOKEN_ENV];
-    if (!botToken) {
-        logger.log(`${constants.TG_BOT_TOKEN_ENV} has not been defined.`);
-        throw new errors.SemanticReleaseError('No Telegram token defined.', 'ENOTELEGRAMTOKEN', `A Telegram Bot Token must be created with BotFather and set in the \`${constants.TG_BOT_TOKEN_ENV}\` environment variable on your CI environment.\n\n\nPlease make sure you created a token and set it in the \`${constants.TG_BOT_TOKEN_ENV}\` environment variable on your CI environment.`);
-    }
-    if (!env.npm_package_name && !config.packageName && !env[constants.TG_BOT_PACKAGE_NAME]) {
-        logger.log('npm package name, config packageName and SEMANTIC_RELEASE_PACKAGE name are undefined');
-        throw new errors.SemanticReleaseError('No name for the package defined.', 'ENOPACKAGENAME', `A name for the package must be created. Define packageName in the plugin config or '${constants.TG_BOT_PACKAGE_NAME}' in the environment`);
-    }
-}
+import type {Context, TGBotConfig} from './interfaces/config';
+import {configurationIssue, environment, packageLabel} from './common/configuration';
 
-export {verifyConditions};
+/** Validate the two inputs needed to build and deliver default notifications. */
+export const verifyConditions = (settings: TGBotConfig, runtime: Context): void => {
+    const requirements = [
+        {
+            satisfied: Boolean(runtime.env[environment.token]?.trim()),
+            code: 'ENOTELEGRAMTOKEN' as const,
+            help: `Provide a BotFather token through ${environment.token} in the release environment.`,
+        },
+        {
+            satisfied: packageLabel(settings, runtime.env) !== undefined,
+            code: 'ENOPACKAGENAME' as const,
+            help: `Set packageName in the plugin options, ${environment.label}, or npm_package_name.`,
+        },
+    ];
+    const missing = requirements.find(requirement => !requirement.satisfied);
+    if (missing) {
+        runtime.logger.log(missing.help);
+        throw configurationIssue(missing.code, missing.help);
+    }
+};
