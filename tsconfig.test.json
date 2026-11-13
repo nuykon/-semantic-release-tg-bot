@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": ".test-build",
+    "declaration": false,
+    "skipLibCheck": true
+  },
+  "files": [],
+  "include": [
+    "index.ts",
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "scripts/**/*.ts",
+    "release.config.ts"
+  ]
+}

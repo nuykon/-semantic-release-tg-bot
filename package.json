@@ -1,0 +1,52 @@
+{
+  "name": "@nuykon/semantic-release-tg-bot",
+  "version": "1.0.0",
+  "description": "Dependency-free TypeScript semantic-release plugin for Telegram notifications",
+  "main": "lib/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node scripts/clean.ts lib && tsc",
+    "lint": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "test": "node scripts/clean.ts .test-build && tsc -p tsconfig.test.json && node --test .test-build/tests/*.test.js",
+    "prepack": "pnpm run build",
+    "semantic-release": "semantic-release",
+    "release:dry-run": "semantic-release --dry-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nuykon/-semantic-release-tg-bot.git"
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "lib"
+  ],
+  "keywords": [
+    "semantic-release",
+    "telegram",
+    "bot",
+    "release",
+    "ci",
+    "telegram-bot",
+    "semantic-release-bot"
+  ],
+  "author": "Sergey Levchenko <sergey@levchenko.pw>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nuykon/-semantic-release-tg-bot/issues"
+  },
+  "homepage": "https://github.com/nuykon/-semantic-release-tg-bot#readme",
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "types": "lib/index.d.ts",
+  "devDependencies": {
+    "@types/node": "^22.20.0",
+    "conventional-changelog-conventionalcommits": "^9.3.1",
+    "semantic-release": "^25.0.9",
+    "typescript": "~5.9.3"
+  },
+  "packageManager": "pnpm@11.0.7"
+}

@@ -1,0 +1,43 @@
+version: 2.1
+jobs:
+  test:
+    parameters:
+      node-version:
+        type: string
+    docker:
+      - image: cimg/node:<< parameters.node-version >>
+    steps:
+      - checkout
+      - run: corepack enable && corepack prepare pnpm@11.0.7 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm test
+      - run: pnpm pack --dry-run
+  deploy:
+    docker:
+      - image: cimg/node:24.11
+    steps:
+      - checkout
+      - run: corepack enable && corepack prepare pnpm@11.0.7 --activate
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run:
+          name: Verify release credentials
+          command: |
+            git fetch --tags origin
+            test -n "$GH_TOKEN"
+            test -n "$NPM_TOKEN"
+      - run: pnpm run semantic-release
+workflows:
+  build-test-deploy:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              node-version: ['22.20', '24.11']
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: [main, beta]
